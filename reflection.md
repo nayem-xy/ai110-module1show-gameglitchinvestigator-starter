@@ -1,167 +1,121 @@
-# 💭 Reflection: Game Glitch Investigator
-
-Answer each question in 3 to 5 sentences. Be specific and honest about what actually happened while you worked. This is about your process, not trying to sound perfect.
+# Game Glitch Investigator Reflection
 
 ## 1. What was broken when you started?
 
-- What did the game look like the first time you ran it?
-- List at least two concrete bugs you noticed at the start  
-  (for example: "the hints were backwards").
+When I first ran the game, I noticed that some of the guessing hints were incorrect. I also found problems with the difficulty settings and the way guesses were compared with the secret number. I investigated the code, reproduced the issues, and corrected the logic in `logic_utils.py` and `app.py`.
 
-When I first ran the game, I noticed that some of the guessing hints were incorrect. I also found problems with the difficulty settings and the way guesses were compared with the secret number. I investigated the code, reproduced the issues, and corrected the logic in logic_utils.py and app.py.
-
-**Bug Reproduction Log**
-
-Document at least 3 bugs you found. Add rows as needed.
+### Bug Reproduction Log
 
 | Input | Expected Behavior | Actual Behavior | Console Output / Error |
-|-------|-------------------|-----------------|------------------------|
-| | | | |
-| | | | |
-| | | | |
+|---|---|---|---|
+| Enter a guess lower than the secret number. | The game should display “Go HIGHER!” | The original game could display an incorrect directional hint. | No console error recorded; the incorrect hint was visible in the app. |
+| Select Easy or Hard and start a new game. | Easy should use numbers 1–20, and Hard should use numbers 1–50. | The original game logic could generate a secret number from 1–100 regardless of the selected difficulty. | No console error recorded; the incorrect range behavior was the issue. |
+| Submit guesses when the secret number and guess may have different data types. | The game should compare the numbers numerically. | Inconsistent data types could cause incorrect comparison results. | No console error recorded for this issue; the incorrect comparison was the problem being investigated. |
 
----
-Bug 1: Incorrect Guessing Hints
+### Bug 1: Incorrect Guessing Hints
 
-Input/Trigger: Enter a guess that is lower than the secret number.
+**Input/Trigger:** Enter a guess lower than or higher than the secret number.
 
-Expected Behavior: The game should tell the player to guess higher.
+**Expected Behavior:** If the guess is lower than the secret number, the game should display “Go HIGHER!” If the guess is higher, it should display “Go LOWER!”
 
-Actual Behavior: The original hint logic displayed incorrect directional messages.
+**Actual Behavior:** The original guessing logic could display the wrong directional message.
 
-Code Location: check_guess() in the original app.py.
+**Code Location:** The `check_guess()` function in the original `app.py`.
 
-Fix: Corrected the comparison logic and the corresponding hint messages in logic_utils.py.
+**Fix:** I corrected the comparison logic and moved it into `logic_utils.py`. The function now returns the correct outcome and hint for guesses that are too high, too low, or correct.
 
-Verification: Tested guesses both above and below the secret number. The hints now match the comparison.
+**Verification:** I manually tested guesses above and below the secret number to confirm that the hints matched the comparisons.
 
-Bug 2: Incorrect Difficulty Range
+### Bug 2: Incorrect Difficulty Range
 
-Input/Trigger: Select Easy or Hard difficulty and start a new game.
+**Input/Trigger:** Select Easy or Hard and start a new game.
 
-Expected Behavior: Easy should use a range of 1–20, Normal should use 1–100, and Hard should use 1–50.
+**Expected Behavior:** Easy should generate a secret number between 1 and 20, Normal between 1 and 100, and Hard between 1 and 50.
 
-Actual Behavior: The original new-game logic could generate the secret number from 1–100 regardless of the selected difficulty.
+**Actual Behavior:** The original New Game logic could generate a number from 1 to 100 regardless of the selected difficulty.
 
-Code Location: The New Game button logic in the original app.py.
+**Code Location:** The New Game logic in the original `app.py`.
 
-Fix: Used get_range_for_difficulty() to determine the appropriate range and generate the secret number within that range.
+**Fix:** I added `get_range_for_difficulty()` in `logic_utils.py` to return the correct range for each difficulty setting.
 
-Verification: Checked the range configuration and updated the new-game logic to use the selected difficulty.
+**Verification:** I checked the difficulty range configuration and the new-game logic to verify that the selected difficulty determines the appropriate range.
 
-Bug 3: Incorrect Number Comparison
+### Bug 3: Incorrect Number Comparison
 
-Input/Trigger: Submit guesses while the secret number is converted between an integer and a string.
+**Input/Trigger:** Submit guesses when the secret number and guess may be represented using different data types.
 
-Expected Behavior: The game should compare the guess and secret numerically and return the correct hint.
+**Expected Behavior:** The game should compare the guess and secret number as numerical values.
 
-Actual Behavior: Comparing numbers as strings could produce incorrect results because string comparisons do not follow numeric ordering.
+**Actual Behavior:** Comparing values with inconsistent data types could lead to incorrect guessing results.
 
-Code Location: The secret-number conversion and check_guess() call in the original app.py.
+**Code Location:** The original input conversion and guessing comparison logic in `app.py`.
 
-Fix: Kept the secret number numeric and used check_guess() from logic_utils.py for comparisons.
+**Fix:** I updated input parsing and guessing logic so that valid guesses are handled as integers and compared numerically through `check_guess()` in `logic_utils.py`.
 
-Verification: Tested the comparison logic with guesses above and below the secret number.
+**Verification:** I tested guesses above and below the secret number and confirmed that the game displayed the correct directional hints.
 
-Summary
+### Summary of Fixes
 
-I separated the game logic into logic_utils.py so that the range selection, input parsing, guessing hints, and score updates could be tested independently. I also created unit tests to verify the corrected behavior. Running python3 -m pytest -q produced 9 passing tests.
+I separated the core game logic into `logic_utils.py` so that individual functions could be tested independently. I added unit tests for difficulty ranges, input parsing, guessing outcomes, and score updates. Running `python3 -m pytest -q` produced **9 passed**.
+
 ## 2. How did you use AI as a teammate?
 
-- Which AI tools did you use on this project (for example: ChatGPT, Gemini, Copilot)?
+I used ChatGPT as a coding assistant to help investigate bugs, understand the existing code, identify possible fixes, and develop test cases. I reviewed the suggested changes and verified the behavior through automated tests and manual testing instead of assuming the generated code was correct.
 
-ChatGPT
+### What AI tool did you use?
 
-- Give one example of an AI suggestion that was correct (including what the AI suggested and how you verified the result).
-- Give one example of an AI suggestion you did not accept as written (including what the AI suggested, why you rejected or changed it, and how you verified your version). It does not have to be a suggestion that was wrong: over-engineered, out of scope, harder to read, or a poor fit for this codebase all count.
+I used ChatGPT to help analyze the game logic, investigate potential bugs, improve the implementation, and identify useful test cases.
 
-AI Suggestion I Rejected or Modified
+### What was one AI suggestion you accepted, and why?
 
+One suggestion I accepted was separating the core game logic into a separate file, `logic_utils.py`, rather than keeping all the logic inside the Streamlit application. This made the functions easier to understand and test independently.
 
-I did not rely on AI suggestions without checking them. I reviewed the proposed changes and ran the unit tests to verify the behavior. I also tested the game manually by comparing guesses above and below the secret number. This helped me confirm that the hints were correct instead of assuming that the suggested code would work. I modified the implementation where needed to fit the existing project and its requirements.
----
-What I Learned
+I implemented functions for difficulty ranges, input parsing, guess comparisons, and score updates. I then ran the automated test suite and manually tested guesses above and below the secret number to verify the results.
 
-I learned that AI can help identify possible bugs and suggest solutions, but its output still needs to be verified. Unit tests help check individual functions, while manual testing confirms that the game behaves correctly in the Streamlit interface. Separating the logic from the interface also makes the project easier to maintain.
+### AI Suggestion I Rejected or Modified
+
+I did not rely on AI suggestions without checking them. I reviewed the proposed changes and ran the unit tests to verify the behavior. I also tested the game manually by comparing guesses above and below the secret number. This helped me confirm that the hints were correct instead of assuming that the suggested code would work.
+
+I also ensured that input parsing rejected invalid whole-number input instead of silently converting a decimal value into an integer. This helped the game handle user input more consistently.
+
+### What did you learn from using AI?
+
+I learned that AI can help me understand unfamiliar code and identify possible solutions more quickly. However, I still need to understand the changes, check whether they fit the project requirements, and test the implementation before trusting it.
+
 ## 3. Debugging and testing your fixes
 
-- How did you decide whether a bug was really fixed?
+### How did you decide whether your bug was fixed?
 
-Automated Testing
+I used both automated tests and manual testing to determine whether a bug was fixed. The automated tests checked individual functions, while browser testing allowed me to observe the game's behavior. I considered a fix successful when the function returned the expected result and the application displayed the correct behavior.
 
-I ran the unit tests from the project root using the following command:
+### Describe at least one test you ran and what it showed.
 
-python3 -m pytest -q
+I tested the game with a secret number of 3 and a guess of 57. The game displayed “Go LOWER!”, which was correct because the guess was greater than the secret number. I then guessed 1 and received “Go HIGHER!”, confirming that the opposite comparison also worked.
 
-The test results were:
+I additionally ran `python3 -m pytest -q` and verified that all nine tests passed.
 
-9 passed
+### Did AI help you design or understand your tests? How?
 
-The tests cover the following areas:
+Yes, ChatGPT helped me identify important test cases for difficulty ranges, input parsing, guess comparisons, and score updates. These cases helped me check individual functions without relying only on the browser interface. I ran the tests locally and used the results to verify the implementation.
 
-Difficulty ranges: Verify the number ranges for Easy, Normal, and Hard.
+The automated tests and manual checks helped me verify that the guessing hints matched the numerical comparisons. Testing both individual functions and the browser interface helped me confirm that the fixes worked as intended.
 
-Input parsing: Check valid whole-number input, empty input, and invalid non-integer input.
+## 4. How would you explain Streamlit reruns and session state to a friend who has never used Streamlit?
 
-Guess comparison: Verify that correct guesses return a win and incorrect guesses return the appropriate directional hint.
+Streamlit reruns the Python script when a user interacts with a widget, such as clicking a button. Ordinary variables can be recreated during each rerun, which can cause a game's secret number or progress to reset unexpectedly.
 
-Score updates: Verify the score awarded for a win and the penalty for an incorrect guess.
+`st.session_state` stores values across reruns during a user's session, allowing the game to remember the secret number, attempts, score, and guess history. I learned that using session state correctly is important for making interactive Streamlit applications behave consistently.
 
+## 5. Reflection and future improvements
 
-- Describe at least one test you ran (manual or using pytest)  
-  and what it showed you about your code.
+### What is one habit from this project that you want to reuse in future projects?
 
-Manual Testing
+I want to reuse the habit of testing code after making small changes instead of waiting until the entire project is finished. I will write tests for important functions and manually check the application when user interactions are involved. I also want to keep my Git commits organized so I can track changes and recover from mistakes more easily.
 
-I also tested the game in the Streamlit browser interface.
+### What would you do differently next time when working with AI?
 
-Test
+Next time, I would ask AI to explain the likely cause of a bug before requesting a complete code replacement. I would make smaller changes, test each one, and compare the results with the original requirements. This would help me understand the solution more deeply and catch mistakes earlier.
 
-Input or condition
+### How has this project changed your view of AI-generated code?
 
-Expected result
-
-Observed result
-
-1
-
-Secret = 3, guess = 57
-
-Display “Go LOWER!”
-
-Displayed “Go LOWER!”
-
-2
-
-Secret = 3, guess = 1
-
-Display “Go HIGHER!”
-
-Displayed “Go HIGHER!”
-
-3
-
-Run the automated test suite
-
-All unit tests pass
-
-9 tests passed
-
-
-- Did AI help you design or understand any tests? How?
-
-The automated tests and manual checks helped me verify that the guessing hints now match the numerical comparisons. The test suite also checks input parsing, difficulty ranges, and score updates. Testing both the individual functions and the browser interface helped me confirm the fixes.
----
-
-## 4. What did you learn about Streamlit and state?
-
-- How would you explain Streamlit "reruns" and session state to a friend who has never used Streamlit?
-
----
-
-## 5. Looking ahead: your developer habits
-
-- What is one habit or strategy from this project that you want to reuse in future labs or projects?
-  - This could be a testing habit, a prompting strategy, or a way you used Git.
-- What is one thing you would do differently next time you work with AI on a coding task?
-- In one or two sentences, describe how this project changed the way you think about AI generated code.
+This project taught me that AI-generated code can be a useful starting point, but it is not automatically correct or reliable. I need to understand, test, and verify the code before trusting it.
