@@ -1,54 +1,95 @@
 # 🎮 Game Glitch Investigator: The Impossible Guesser
 
-## 🚨 The Situation
+## 🎯 The Game's Purpose
 
-You asked an AI to build a simple "Number Guessing Game" using Streamlit.
-It wrote the code, ran away, and now the game is unplayable. 
+The Impossible Guesser is a number-guessing game built with Streamlit. The player selects a difficulty, guesses a secret number, receives higher-or-lower hints, and earns or loses points based on their guesses.
 
-- You can't win.
-- The hints lie to you.
-- The secret number seems to have commitment issues.
+The original AI-generated version contained bugs in its guessing hints, difficulty ranges, and number comparisons. This project investigates those bugs, fixes the game logic, and uses automated tests to verify the changes.
 
 ## 🛠️ Setup
 
-1. Install dependencies: `pip install -r requirements.txt`
-2. Run the broken app: `python -m streamlit run app.py`
+### Requirements
 
-## 🕵️‍♂️ Your Mission
+- Python 3
+- The dependencies listed in `requirements.txt`
 
-1. **Play the game.** Open the "Developer Debug Info" tab in the app to see the secret number. Try to win.
-2. **Find the State Bug.** Why does the secret number change every time you click "Submit"? Ask ChatGPT: *"How do I keep a variable from resetting in Streamlit when I click a button?"*
-3. **Fix the Logic.** The hints ("Higher/Lower") are wrong. Fix them.
-4. **Refactor & Test.** - Move the logic into `logic_utils.py`.
-   - Run `pytest` in your terminal.
-   - Keep fixing until all tests pass!
+### Installation
 
-## 📝 Document Your Experience
+1. Clone or download this repository.
+2. Open a terminal in the project directory.
+3. Create and activate a virtual environment if needed:
 
-- [ ] Describe the game's purpose.
-- [ ] Detail which bugs you found.
-- [ ] Explain what fixes you applied.
+   ```bash
+   python3 -m venv .venv
+   source .venv/bin/activate
+   ```
+
+4. Install dependencies:
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+5. Run the game:
+
+   ```bash
+   python3 -m streamlit run app.py
+   ```
+
+Streamlit will provide a local URL to open in your browser.
+
+## 🐛 Bugs Found and Fixes Applied
+
+### 1. Incorrect Guessing Hints
+
+**Problem:** The original game displayed misleading higher-or-lower hints.
+
+**Fix:** Corrected `check_guess()` so guesses above the secret number display “Go LOWER!” and guesses below it display “Go HIGHER!”
+
+### 2. Incorrect Difficulty Range
+
+**Problem:** The original New Game logic could generate a secret number between 1 and 100 regardless of the selected difficulty.
+
+**Fix:** Used `get_range_for_difficulty()` to select the correct range: Easy (1–20), Normal (1–100), and Hard (1–50).
+
+### 3. Incorrect Number Comparisons
+
+**Problem:** Converting the secret number between a string and an integer could cause incorrect comparisons.
+
+**Fix:** Kept the secret number numeric and moved the guessing logic into `logic_utils.py`.
+
+### Additional Improvements
+
+- Added input validation for empty input and invalid whole-number guesses.
+- Corrected score updates for wins and incorrect guesses.
+- Used Streamlit session state to preserve the secret number and game progress across interactions.
+- Added unit tests for the core game logic.
 
 ## 📸 Demo Walkthrough
 
-Describe your fixed game in numbered steps so a reader can follow along without watching a video:
-
-1. <!-- Describe this step -->
-2. <!-- Describe this step -->
-3. <!-- Describe this step -->
-4. <!-- Describe this step -->
-5. <!-- Add more steps as needed -->
-
-**Screenshot** *(optional)*: <!-- Insert a screenshot of your fixed, winning game here -->
+1. Launch the application and open it in your browser.
+2. Select Easy, Normal, or Hard difficulty and review the displayed number range and attempt limit.
+3. Open **Developer Debug Info** to inspect the secret number for testing.
+4. Enter guesses above and below the secret number and verify that the hints are correct.
+5. Enter the correct number to win, or use **New Game** to reset the game and start again.
 
 ## 🧪 Test Results
 
+Run the unit tests from the project root:
+
+```bash
+python3 -m pytest -q
 ```
-# Paste your pytest output here, e.g.:
-# pytest tests/
-# ========================= X passed in 0.XXs =========================
+
+Verified output:
+
+```text
+9 passed
 ```
+
+The tests cover difficulty ranges, input parsing, guess comparisons and hints, and score updates.
 
 ## 🚀 Stretch Features
 
-- [ ] [If you choose to complete Challenge 4, describe the Enhanced UI changes here — a screenshot is optional]
+The game includes an enhanced interface with difficulty selection, attempt limits, a score display in Developer Debug Info, guess history, optional hints, and a New Game button.
+
